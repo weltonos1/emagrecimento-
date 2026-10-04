@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FitCouple - Acompanhamento Completo</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --andressa-color: #EC4899;
+            --welton-color: #3B82F6;
+            --bg: #F3F4F6;
+            --card: #FFFFFF;
+            --text: #1F2937;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg);
+            color: var(--text);
+            padding: 16px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .header {
+            text-align: center;
+            background: linear-gradient(135deg, #6366F1, #4F46E5);
+            color: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+
+        .header h1 { font-size: 1.5rem; margin-bottom: 4px; }
+        .header p { opacity: 0.9; font-size: 0.9rem; }
+
+        .couple-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        @media (max-width: 480px) {
+            .couple-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .card {
+            background: var(--card);
+            border-radius: 16px;
+            padding: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #F3F4F6;
+            padding-bottom: 8px;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .meta-badge {
+            font-size: 0.75rem;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .andressa-badge { background-color: #FCE7F3; color: var(--andressa-color); }
+        .welton-badge { background-color: #DBEAFE; color: var(--welton-color); }
+
+        .input-block {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .input-block label {
+            font-size: 0.75rem;
+            color: #6B7280;
+            font-weight: 600;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 6px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 8px 10px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        input[type="number"]:focus { border-color: var(--primary); }
+
+        button {
+            border: none;
+            padding: 8px 12px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            color: white;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            transition: opacity 0.2s;
+        }
+
+        button:hover { opacity: 0.9; }
+
+        .btn-andressa { background-color: var(--andressa-color); }
+        .btn-welton { background-color: var(--welton-color); }
+
+        .stats-container {
+            background-color: #F9FAFB;
+            border-radius: 10px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.8rem;
+        }
+
+        .stat-label { color: #6B7280; }
+        .stat-value { font-weight: 700; color: var(--text); }
+
+        .chart-box {
+            position: relative;
+            height: 160px;
+            width: 100%;
+        }
+
+        .history-section {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .history-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            color: #4B5563;
+        }
+
+        .history-list {
+            max-height: 100px;
+            overflow-y: auto;
+            border: 1px solid #F3F4F6;
+            border-radius: 8px;
+            padding: 4px;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 4px 6px;
+            font-size: 0.75rem;
+            border-bottom: 1px solid #F9FAFB;
+        }
+
+        .history-item:last-child { border-bottom: none; }
+
+        .delete-btn {
+            background: transparent;
+            color: #EF4444;
+            padding: 2px 4px;
+            font-size: 0.7rem;
+            border-radius: 4px;
+        }
+
+        .delete-btn:hover { background-color: #FEE2E2; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>👩‍❤️️‍👨 FitCouple</h1>
+        <p>Acompanhamento de Emagrecimento & Metas</p>
+    </div>
+
+    <div class="couple-grid">
+        <!-- CARD ANDRESSA -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">🌸 Andressa</span>
+                <span class="meta-badge andressa-badge">-800g/sem</span>
+            </div>
+
+            <div class="input-block">
+                <label>Meta Final (kg)</label>
+                <div class="input-group">
+                    <input type="number" id="targetAndressa" step="0.1" placeholder="Ex: 60.0">
+                    <button class="btn-andressa" onclick="setTarget('Andressa')">Salvar</button>
+                </div>
+            </div>
+
+            <div class="input-block">
+                <label>Novo Peso (kg)</label>
+                <div class="input-group">
+                    <input type="number" id="weightAndressa" step="0.1" placeholder="Ex: 65.5">
+                    <button class="btn-andressa" onclick="addWeight('Andressa')">Registrar</button>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-row">
+                    <span class="stat-label">Perda Total:</span>
+                    <span class="stat-value" id="totalAndressa">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Última Semana:</span>
+                    <span class="stat-value" id="weeklyAndressa">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Falta p/ Alvo:</span>
+                    <span class="stat-value" id="targetDiffAndressa">-</span>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="chartAndressa"></canvas>
+            </div>
+
+            <div class="history-section">
+                <span class="history-title">Histórico</span>
+                <div class="history-list" id="historyAndressa"></div>
+            </div>
+        </div>
+
+        <!-- CARD WELTON -->
+        <div class="card">
+            <div class="card-header">
+                <span class="card-title">⚡ Welton</span>
+                <span class="meta-badge welton-badge">-900g/sem</span>
+            </div>
+
+            <div class="input-block">
+                <label>Meta Final (kg)</label>
+                <div class="input-group">
+                    <input type="number" id="targetWelton" step="0.1" placeholder="Ex: 75.0">
+                    <button class="btn-welton" onclick="setTarget('Welton')">Salvar</button>
+                </div>
+            </div>
+
+            <div class="input-block">
+                <label>Novo Peso (kg)</label>
+                <div class="input-group">
+                    <input type="number" id="weightWelton" step="0.1" placeholder="Ex: 82.0">
+                    <button class="btn-welton" onclick="addWeight('Welton')">Registrar</button>
+                </div>
+            </div>
+
+            <div class="stats-container">
+                <div class="stat-row">
+                    <span class="stat-label">Perda Total:</span>
+                    <span class="stat-value" id="totalWelton">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Última Semana:</span>
+                    <span class="stat-value" id="weeklyWelton">-</span>
+                </div>
+                <div class="stat-row">
+                    <span class="stat-label">Falta p/ Alvo:</span>
+                    <span class="stat-value" id="targetDiffWelton">-</span>
+                </div>
+            </div>
+
+            <div class="chart-box">
+                <canvas id="chartWelton"></canvas>
+            </div>
+
+            <div class="history-section">
+                <span class="history-title">Histórico</span>
+                <div class="history-list" id="historyWelton"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const metasSemanais = { Andressa: 0.8, Welton: 0.9 };
+
+    let data = JSON.parse(localStorage.getItem('fitCoupleData')) || {
+        Andressa: { target: null, logs: [] },
+        Welton: { target: null, logs: [] }
+    };
+
+    if (Array.isArray(data.Andressa)) {
+        data = {
+            Andressa: { target: null, logs: data.Andressa },
+            Welton: { target: null, logs: data.Welton }
+        };
+    }
+
+    const charts = {};
+
+    function initChart(user, color) {
+        const ctx = document.getElementById(`chart${user}`).getContext('2d');
+        charts[user] = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data[user].logs.map(entry => entry.date),
+                datasets: [{
+                    label: 'Peso (kg)',
+                    data: data[user].logs.map(entry => entry.weight),
+                    borderColor: color,
+                    backgroundColor: color + '22',
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.3,
+                    pointRadius: 3,
+                    pointBackgroundColor: color
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: false } }
+            }
+        });
+
+        if (data[user].target) {
+            document.getElementById(`target${user}`).value = data[user].target;
+        }
+
+        updateStats(user);
+        renderHistory(user);
+    }
+
+    function setTarget(user) {
+        const input = document.getElementById(`target${user}`);
+        const targetValue = parseFloat(input.value);
+        if (!targetValue) return;
+
+        data[user].target = targetValue;
+        localStorage.setItem('fitCoupleData', JSON.stringify(data));
+        updateStats(user);
+    }
+
+    function addWeight(user) {
+        const input = document.getElementById(`weight${user}`);
+        const weight = parseFloat(input.value);
+        if (!weight) return;
+
+        const dateStr = new Date().toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit' });
+        data[user].logs.push({ date: dateStr, weight: weight });
+        
+        localStorage.setItem('fitCoupleData', JSON.stringify(data));
+        
+        charts[user].data.labels.push(dateStr);
+        charts[user].data.datasets[0].data.push(weight);
+        charts[user].update();
+
+        input.value = '';
+        updateStats(user);
+        renderHistory(user);
+    }
+
+    function removeLog(user, index) {
+        data[user].logs.splice(index, 1);
+        localStorage.setItem('fitCoupleData', JSON.stringify(data));
+
+        charts[user].data.labels = data[user].logs.map(entry => entry.date);
+        charts[user].data.datasets[0].data = data[user].logs.map(entry => entry.weight);
+        charts[user].update();
+
+        updateStats(user);
+        renderHistory(user);
+    }
+
+    function updateStats(user) {
+        const totalElem = document.getElementById(`total${user}`);
+        const weeklyElem = document.getElementById(`weekly${user}`);
+        const targetDiffElem = document.getElementById(`targetDiff${user}`);
+        const userLogs = data[user].logs;
+
+        if (userLogs.length === 0) {
+            totalElem.innerText = '-';
+            weeklyElem.innerText = '-';
+            targetDiffElem.innerText = '-';
+            return;
+        }
+
+        const initial = userLogs[0].weight;
+        const current = userLogs[userLogs.length - 1].weight;
+        const totalDiff = (initial - current).toFixed(1);
+
+        totalElem.innerText = totalDiff > 0 ? `-${totalDiff} kg` : `+${Math.abs(totalDiff)} kg`;
+
+        if (userLogs.length >= 2) {
+            const previous = userLogs[userLogs.length - 2].weight;
+            const weeklyDiff = (previous - current).toFixed(1);
+            weeklyElem.innerText = weeklyDiff > 0 ? `-${weeklyDiff} kg` : `${weeklyDiff} kg`;
+        } else {
+            weeklyElem.innerText = '1º Registro';
+        }
+
+        if (data[user].target) {
+            const diffTarget = (current - data[user].target).toFixed(1);
+            targetDiffElem.innerText = diffTarget > 0 ? `${diffTarget} kg` : 'Concluído!';
+        } else {
+            targetDiffElem.innerText = 'Sem Alvo';
+        }
+    }
+
+    function renderHistory(user) {
+        const historyDiv = document.getElementById(`history${user}`);
+        historyDiv.innerHTML = '';
+
+        data[user].logs.slice().reverse().forEach((log, revIndex) => {
+            const realIndex = data[user].logs.length - 1 - revIndex;
+            const item = document.createElement('div');
+            item.className = 'history-item';
+            item.innerHTML = `
+                <span>${log.date} - <strong>${log.weight} kg</strong></span>
+                <button class="delete-btn" onclick="removeLog('${user}', ${realIndex})">Apagar</button>
+            `;
+            historyDiv.appendChild(item);
+        });
+    }
+
+    window.onload = () => {
+        initChart('Andressa', '#EC4899');
+        initChart('Welton', '#3B82F6');
+    };
+</script>
+
+</body>
+</html>
